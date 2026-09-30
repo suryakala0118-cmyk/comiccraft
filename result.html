@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        ComicCraft - Your Comic
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', path='css/style.css') }}"
+    >
+
+    <style>
+        .result-header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .result-header h1 {
+            margin-bottom: 10px;
+        }
+
+        .result-header p {
+            color: #64748b;
+        }
+
+        .comic-container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .comic-title {
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 16px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        .comic-title h2 {
+            margin: 0;
+            color: #4f46e5;
+        }
+
+        .story-section {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        .story-section h2 {
+            margin-top: 0;
+        }
+
+        .story-text {
+            white-space: pre-wrap;
+            line-height: 1.8;
+            color: #374151;
+        }
+
+        .panels-section {
+            margin-bottom: 30px;
+        }
+
+        .panels-section > h2 {
+            margin-bottom: 20px;
+        }
+
+        .comic-panels {
+            display: grid;
+            grid-template-columns:
+                repeat(
+                    auto-fit,
+                    minmax(280px, 1fr)
+                );
+            gap: 25px;
+        }
+
+        .comic-panel {
+            background: #ffffff;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow:
+                0 8px 30px
+                rgba(0, 0, 0, 0.08);
+        }
+
+        .panel-image {
+            width: 100%;
+            min-height: 250px;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .panel-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .no-image {
+            color: #64748b;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .panel-content {
+            padding: 20px;
+        }
+
+        .panel-number {
+            display: inline-block;
+            background: #4f46e5;
+            color: #ffffff;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .panel-content h3 {
+            margin: 0 0 10px;
+        }
+
+        .panel-description {
+            color: #475569;
+            line-height: 1.6;
+        }
+
+        .dialogue {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8fafc;
+            border-left: 4px solid #4f46e5;
+            border-radius: 8px;
+        }
+
+        .dialogue strong {
+            display: block;
+            margin-bottom: 5px;
+            color: #312e81;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 35px 0;
+        }
+
+        .action-button {
+            display: inline-block;
+            padding: 13px 20px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        .primary-action {
+            background: #4f46e5;
+            color: #ffffff;
+        }
+
+        .primary-action:hover {
+            background: #4338ca;
+        }
+
+        .secondary-action {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+
+        .secondary-action:hover {
+            background: #c7d2fe;
+        }
+
+        .success-message {
+            display: none;
+            background: #dcfce7;
+            color: #166534;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        @media print {
+
+            body {
+                background: #ffffff;
+            }
+
+            .action-buttons {
+                display: none;
+            }
+
+            .comic-panel {
+                break-inside: avoid;
+            }
+
+            .story-section,
+            .comic-title,
+            .comic-panel {
+                box-shadow: none;
+                border: 1px solid #ddd;
+            }
+        }
+
+        @media (max-width: 600px) {
+
+            .comic-panels {
+                grid-template-columns: 1fr;
+            }
+
+            .story-section,
+            .comic-title {
+                padding: 20px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .action-button {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+
+<body>
+
+<div class="container">
+
+    <!-- Header -->
+    <header class="result-header">
+
+        <div class="logo">
+            ComicCraft
+        </div>
+
+        <h1>
+            Your Comic Is Ready!
+        </h1>
+
+        <p>
+            Your AI-generated comic has been created successfully.
+        </p>
+
+    </header>
+
+
+    <main class="comic-container">
+
+
+        <!-- Comic Title -->
+        <section class="comic-title">
+
+            <h2>
+                {% if title %}
+                    {{ title }}
+                {% else %}
+                    Your AI Generated Comic
+                {% endif %}
+            </h2>
+
+        </section>
+
+
+        <!-- Success Message -->
+        <div
+            id="success-message"
+            class="success-message"
+        >
+            Comic copied successfully!
+        </div>
+
+
+        <!-- Story -->
+        {% if story %}
+
+        <section class="story-section">
+
+            <h2>
+                Story
+            </h2>
+
+            <div
+                id="story-text"
+                class="story-text"
+            >
+                {{ story }}
+            </div>
+
+        </section>
+
+        {% endif %}
+
+
+        <!-- Comic Panels -->
+        {% if panels %}
+
+        <section class="panels-section">
+
+            <h2>
+                Comic Panels
+            </h2>
+
+
+            <div class="comic-panels">
+
+                {% for panel in panels %}
+
+                <article class="comic-panel">
+
+
+                    <!-- Panel Image -->
+                    <div class="panel-image">
+
+                        {% if panel.image_url %}
+
+                        <img
+                            src="{{ panel.image_url }}"
+                            alt="Comic panel {{ loop.index }}"
+                            loading="lazy"
+                        >
+
+                        {% elif panel.image %}
+
+                        <img
+                            src="{{ panel.image }}"
+                            alt="Comic panel {{ loop.index }}"
+                            loading="lazy"
+                        >
+
+                        {% else %}
+
+                        <div class="no-image">
+                            <p>
+                                Image not available
+                            </p>
+                        </div>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- Panel Content -->
+                    <div class="panel-content">
+
+                        <span class="panel-number">
+                            Panel {{ loop.index }}
+                        </span>
+
+
+                        {% if panel.title %}
+
+                        <h3>
+                            {{ panel.title }}
+                        </h3>
+
+                        {% endif %}
+
+
+                        {% if panel.description %}
+
+                        <p class="panel-description">
+                            {{ panel.description }}
+                        </p>
+
+                        {% endif %}
+
+
+                        {% if panel.scene %}
+
+                        <p class="panel-description">
+                            <strong>Scene:</strong>
+                            {{ panel.scene }}
+                        </p>
+
+                        {% endif %}
+
+
+                        {% if panel.dialogue %}
+
+                        <div class="dialogue">
+
+                            <strong>
+                                Dialogue
+                            </strong>
+
+                            {{ panel.dialogue }}
+
+                        </div>
+
+                        {% endif %}
+
+
+                        {% if panel.caption %}
+
+                        <div class="dialogue">
+
+                            <strong>
+                                Caption
+                            </strong>
+
+                            {{ panel.caption }}
+
+                        </div>
+
+                        {% endif %}
+
+                    </div>
+
+                </article>
+
+                {% endfor %}
+
+            </div>
+
+        </section>
+
+        {% endif %}
+
+
+        <!-- Alternative support if the backend provides images separately -->
+        {% if images and not panels %}
+
+        <section class="panels-section">
+
+            <h2>
+                Comic Panels
+            </h2>
+
+            <div class="comic-panels">
+
+                {% for image in images %}
+
+                <article class="comic-panel">
+
+                    <div class="panel-image">
+
+                        <img
+                            src="{{ image }}"
+                            alt="Comic panel {{ loop.index }}"
+                            loading="lazy"
+                        >
+
+                    </div>
+
+                    <div class="panel-content">
+
+                        <span class="panel-number">
+                            Panel {{ loop.index }}
+                        </span>
+
+                    </div>
+
+                </article>
+
+                {% endfor %}
+
+            </div>
+
+        </section>
+
+        {% endif %}
+
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+
+
+            <a
+                href="/"
+                class="action-button secondary-action"
+            >
+                Create Another Comic
+            </a>
+
+
+            <button
+                type="button"
+                class="action-button primary-action"
+                onclick="window.print()"
+            >
+                Print Comic
+            </button>
+
+
+            <button
+                type="button"
+                class="action-button secondary-action"
+                onclick="copyComic()"
+            >
+                Copy Story
+            </button>
+
+
+            {% if pdf_filename %}
+
+            <a
+                href="/download/pdf/{{ pdf_filename }}"
+                class="action-button primary-action"
+            >
+                Download PDF
+            </a>
+
+            {% endif %}
+
+
+            {% if comic_id %}
+
+            <a
+                href="/history"
+                class="action-button secondary-action"
+            >
+                View History
+            </a>
+
+            {% endif %}
+
+        </div>
+
+
+    </main>
+
+
+    <footer>
+
+        <p>
+            ComicCraft &copy; 2026
+        </p>
+
+        <p>
+            AI-generated content should be reviewed before publication.
+        </p>
+
+    </footer>
+
+</div>
+
+
+<script>
+
+function copyComic() {
+
+    const storyElement =
+        document.getElementById("story-text");
+
+    if (!storyElement) {
+        return;
+    }
+
+    const story =
+        storyElement.innerText;
+
+    if (
+        navigator.clipboard &&
+        window.isSecureContext
+    ) {
+
+        navigator.clipboard
+            .writeText(story)
+            .then(() => {
+                showCopyMessage();
+            })
+            .catch(() => {
+                fallbackCopy(story);
+            });
+
+    } else {
+
+        fallbackCopy(story);
+
+    }
+}
+
+
+function fallbackCopy(text) {
+
+    const textarea =
+        document.createElement("textarea");
+
+    textarea.value = text;
+
+    textarea.style.position = "fixed";
+    textarea.style.left = "-999999px";
+
+    document.body.appendChild(textarea);
+
+    textarea.focus();
+    textarea.select();
+
+    try {
+
+        document.execCommand("copy");
+
+        showCopyMessage();
+
+    } catch (error) {
+
+        alert(
+            "Unable to copy the story. Please select and copy it manually."
+        );
+
+    }
+
+    document.body.removeChild(textarea);
+}
+
+
+function showCopyMessage() {
+
+    const message =
+        document.getElementById(
+            "success-message"
+        );
+
+    if (!message) {
+        return;
+    }
+
+    message.style.display = "block";
+
+    setTimeout(() => {
+
+        message.style.display = "none";
+
+    }, 3000);
+}
+
+</script>
+
+</body>
+
+</html>
